@@ -4,7 +4,7 @@ import pandas as pd
 from wordcloud import WordCloud, STOPWORDS
 
 
-def sunburst(df: pd.DataFrame):
+def sunburst(df: pd.DataFrame, figureName: str = "sunburst"):
     df_circle = df.groupby(by="hour")["message"].count().reset_index()
 
     time = df_circle["hour"]
@@ -76,9 +76,10 @@ def sunburst(df: pd.DataFrame):
     plt.setp(ax.get_yticklabels(), visible=False)
     plt.tight_layout()
     plt.show()
+	plt.savefig(figureName + ".png")
 
 
-def wordcloud(df: pd.DataFrame, stopwords: list):
+def wordcloud(df: pd.DataFrame, stopwords: list, figureName: str = "wordcloud"):
     messages = [word.split() for word in df["message"].values]
     words = [word.lower() for sublist in messages for word in sublist]
 
@@ -102,3 +103,4 @@ def wordcloud(df: pd.DataFrame, stopwords: list):
     plt.axis("off")
     plt.tight_layout()
     plt.show()
+	plt.savefig(figureName + ".png")

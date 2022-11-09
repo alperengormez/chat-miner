@@ -109,6 +109,8 @@ class WhatsAppParser(Parser):
         parsed_messages = []
         for mess in self.messages:
             parsed_mess = self._parse_message(mess)
+			if parsed_mess['message'] == '<Media omitted>': # when the chat is exported without the media
+				continue
             if parsed_mess:
                 parsed_messages.append(parsed_mess)
 
@@ -147,6 +149,8 @@ class WhatsAppParser(Parser):
         max_first = 0
         max_second = 0
         for line in self.messages:
+			if "Passcode" in line or "Meeting ID" in line: # TODO: Zoom links cause an error. This is a temporary fix.
+				continue
             line = line.replace(r"/", ".", 2)
             day_and_month = [int(num) for num in line.split(".")[:2]]
             max_first = max(max_first, day_and_month[0])
