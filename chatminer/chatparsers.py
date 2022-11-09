@@ -109,8 +109,8 @@ class WhatsAppParser(Parser):
         parsed_messages = []
         for mess in self.messages:
             parsed_mess = self._parse_message(mess)
-			if parsed_mess['message'] == '<Media omitted>': # when the chat is exported without the media, wordcloud figure might have huge "media omitted".
-				continue
+		    if parsed_mess['message'] == '<Media omitted>': # when the chat is exported without the media, wordcloud figure might have huge "media omitted".
+			    continue
             if parsed_mess:
                 parsed_messages.append(parsed_mess)
 
