@@ -1,3 +1,5 @@
+**Alperen edit:** I fixed Zoom link errors and "media omitted" messages for my purposes. I have also added two plots for weekly and monthly frequencies for my own purposes.
+
 # chat-miner: parsing of chat histories
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -36,5 +38,3 @@ import chatminer.visualizations as vis
 stopwords = ['media', 'omitted', 'missed', 'voice', 'call']
 vis.wordcloud(parser.df, stopwords)
 ```
-
-**Alperen edit:** I have added two plots for weekly and monthly frequencies for my own purposes.
