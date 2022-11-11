@@ -30,11 +30,9 @@ print(parser.df.describe())
 import chatminer.visualizations as vis
 vis.sunburst(parser.df)
 ```
-![Sunburst](examples/sunburst.png)
 
 ```python
 import chatminer.visualizations as vis
 stopwords = ['media', 'omitted', 'missed', 'voice', 'call']
 vis.wordcloud(parser.df, stopwords)
 ```
-![Wordcloud](examples/wordcloud.png)
