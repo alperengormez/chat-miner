@@ -49,6 +49,7 @@ class Parser(ABC):
     def _add_metadata(self):
         self.df["weekday"] = self.df["datetime"].dt.day_name()
         self.df["hour"] = self.df["datetime"].dt.hour
+        self.df["month"] = self.df["datetime"].dt.month_name() # added month
         self.df["words"] = self.df["message"].apply(lambda s: len(s.split(" ")))
         self.df["letters"] = self.df["message"].apply(len)
 
@@ -109,10 +110,16 @@ class WhatsAppParser(Parser):
         parsed_messages = []
         for mess in self.messages:
             parsed_mess = self._parse_message(mess)
+<<<<<<< Updated upstream
 		    if parsed_mess['message'] == '<Media omitted>': # when the chat is exported without the media, wordcloud figure might have huge "media omitted".
 			    continue
+=======
+            if parsed_mess['message'] == '<Media omitted>':
+                continue
+>>>>>>> Stashed changes
             if parsed_mess:
                 parsed_messages.append(parsed_mess)
+        #print(parsed_messages)
 
         self.df = pd.DataFrame(parsed_messages)
         self._logger.info("Finished parsing chatlog into dataframe.")
@@ -149,6 +156,7 @@ class WhatsAppParser(Parser):
         max_first = 0
         max_second = 0
         for line in self.messages:
+<<<<<<< Updated upstream
 			if "Passcode" in line or "Meeting ID" in line: # TODO: Zoom links cause an error. This is a temporary workaround.
 				continue
             line = line.replace(r"/", ".", 2)
@@ -157,6 +165,15 @@ class WhatsAppParser(Parser):
             max_second = max(max_second, day_and_month[1])
             if (max_first > 12) and (max_second > 12):
                 raise ValueError(f"Invalid date format: {line}")
+=======
+            if "Passcode" not in line and "Meeting ID" not in line: # for zoom links, a workaround for now
+                line = line.replace(r"/", ".", 2)
+                day_and_month = [int(num) for num in line.split(".")[:2]]
+                max_first = max(max_first, day_and_month[0])
+                max_second = max(max_second, day_and_month[1])
+                if (max_first > 12) and (max_second > 12):
+                    raise ValueError(f"Invalid date format: {line}")
+>>>>>>> Stashed changes
 
         if max_first > 12 and max_second <= 12:
             self._logger.info("Inferred day first format.")
@@ -172,27 +189,31 @@ class WhatsAppParser(Parser):
             self._datetime_format = StartOfDateType.AMBIGUOUS
 
     def _parse_message(self, mess):
-        if self._datetime_format in (StartOfDateType.DAY, StartOfDateType.AMBIGUOUS):
-            time = datetimeparser.parse(
-                mess.split("-", 1)[0], dayfirst=True, fuzzy=True
-            )
+            
+        if "Passcode" not in mess and "Meeting ID" not in mess: # for zoom links, a workaround for now
+            if self._datetime_format in (StartOfDateType.DAY, StartOfDateType.AMBIGUOUS):
+                time = datetimeparser.parse(
+                    mess.split("-", 1)[0], dayfirst=True, fuzzy=True
+                )
+            else:
+                time = datetimeparser.parse(
+                    mess.split("-", 1)[0], dayfirst=False, fuzzy=True
+                )
+    
+            author = self._get_message_author(mess)
+            if author != "System":
+                body = mess.split("-", 1)[1].split(":", 1)[1].strip()
+            else:
+                if len(mess.split("-", 1)) == 1:
+                    self._logger.warning(f"Failed to parse message: {mess}.")
+                    self._logger.warning("Please report message format in GitHub.")
+                    return None
+                body = mess.split("-", 1)[1]
+    
+            parsed_message = {"datetime": time, "author": author, "message": body}
+            return parsed_message
         else:
-            time = datetimeparser.parse(
-                mess.split("-", 1)[0], dayfirst=False, fuzzy=True
-            )
-
-        author = self._get_message_author(mess)
-        if author != "System":
-            body = mess.split("-", 1)[1].split(":", 1)[1].strip()
-        else:
-            if len(mess.split("-", 1)) == 1:
-                self._logger.warning(f"Failed to parse message: {mess}.")
-                self._logger.warning("Please report message format in GitHub.")
-                return None
-            body = mess.split("-", 1)[1]
-
-        parsed_message = {"datetime": time, "author": author, "message": body}
-        return parsed_message
+            return {"datetime": datetimeparser.parse(  str(datetime.datetime.now()), dayfirst=False, fuzzy=True), "author": self._get_message_author(mess), "message": "link"}
 
     def _get_message_author(self, message):
         patterns = [
