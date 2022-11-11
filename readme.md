@@ -37,4 +37,4 @@ stopwords = ['media', 'omitted', 'missed', 'voice', 'call']
 vis.wordcloud(parser.df, stopwords)
 ```
 
-Alperen edit: I have added two plots for weekly and monthly frequencies for my own purposes.
+**Alperen edit:** I have added two plots for weekly and monthly frequencies for my own purposes.
